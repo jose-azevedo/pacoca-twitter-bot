@@ -4,8 +4,9 @@
 
 console.log("The dog is alive");
 
-var Twitter = require('twitter');
-var config = require('./config');
+const Twitter = require('twitter');
+const config = require('./config');
+const fs = require('fs'); 
 
 var T = new Twitter(config);
 
@@ -19,43 +20,59 @@ function barkGenerator() {
     return barkTweet;
 }
 
-T.get('search/tweets', { q: 'paçoca since:2020-05-02', count: 1 }, function(err, data, response) {
-    var tweets = data.statuses;
-    
-    for(var i = 0; i < tweets.length; i++){
-        console.log(tweets[i].text);
-        console.log(tweets[i].user.screen_name);
-        var replyTo = tweets[i].user.screen_name;
-        var replyId = tweets[i].id;
-        var replyId_str = tweets[i].id_str;
-        console.log('Tweet ID: ' + tweets[i].id);
-        console.log('Tweet ID_STR: ' + tweets[i].id_str);
-        bark(replyTo, replyId, replyId_str);
-        console.log(tweets[i].created_at);
-   }
-});
-
 function bark(barkTo, barkToId, barkToIdStr) {
     var params = { 
         status: '@' + barkTo +  ' ' + barkGenerator(),
-        in_reply_to_status_id: barkToIdStr,
-        //in_reply_to_status_id_str: barkToIdStr,
+        in_reply_to_status_id: barkToIdStr, // Precisa ser a id_str pq o javascript não suporta um número tão grande
         auto_populate_reply_metadata: true
     };
-    console.log(params);
+    console.log(`Bark: ${params.status}`);
+    console.log(`Barking to tweet ID: ${params.in_reply_to_status_id}`);
     T.post('statuses/update', params , function(err, data, response) {
         if(!err){
-            console.log('Tuitado');
-            //console.log(data);
-            console.log(data.text);
-            console.log(data.id);
-            console.log(data.id_str);
-            console.log(data.in_reply_to_status_id);
-            console.log(data.in_reply_to_status_id_str);
+            console.log(`Bark: ${data.status}`);
+            console.log(`Barking to tweet ID: ${data.in_reply_to_status_id_str}`);
         } else {
             console.log(err);
         }
     });
 }
-//bark();
-//setInterval(bark, 1000*60*10);
+
+var stream = T.stream('statuses/filter', {track: 'paçoca'});
+stream.on('data', function(event) {
+    console.log(event && event.text);
+    var replyTo = event.user.screen_name;
+    var replyId = event.id;
+    var replyId_str = event.id_str;
+    bark(replyTo, replyId, replyId_str);
+});
+
+stream.on('error', function(error) {
+  throw error;
+});
+
+
+
+function regularBark() {
+    var pic = fs.readFileSync('fotos/preguica.jpg');
+    T.post('media/upload', {media: pic}, function(err, media, response){
+        if(!err){
+            var params = { 
+                status: 'Preguicinha...',
+                media_ids: media.media_id_string
+            };
+            
+            T.post('statuses/update', params , function(err, data, response) {
+                if(!err){
+                    console.log('Preguiça tuitada');
+                } else {
+                    console.log(err);
+                }
+            });
+        } else {
+            console.log(err);
+        }
+    });
+}
+
+regularBark();
