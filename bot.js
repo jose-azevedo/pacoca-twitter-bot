@@ -51,20 +51,62 @@ stream.on('error', function(error) {
   throw error;
 });
 
+function dogAction() {
+    // ações do cachorro virtual:
+    // Dormir, fazer xixi, morder alguma coisa, ficar entediado
+    var status;
+    var picPath;
 
+    var actionId = Math.floor(Math.random()*5)+1;
+    //var actionId = 5
+    switch (actionId) {
+        case 1: 
+            status = 'ZZzzzZZZzzzz.....';
+            picPath = 'fotos/preguica.jpg';
+            break;
+        case 2: 
+            status = 'Meh';
+            picPath = 'fotos/tedio.jpg';
+            break;
+        case 3: 
+            status = '*xiiiiiiiiiiiiiii*';
+            picPath = 'fotos/xixi.jpg'
+            break;
+        case 4: 
+            status = 'GRRRRRRRR';
+            picPath = 'fotos/raiva.jpg';
+            break;
+        case 5: 
+            status = 'WOUF';
+            picPath = 'fotos/deboa.jpg';
+            break;
+    
+        default:
+            status = 'WOUF';
+            picPath = 'fotos/deboa.jpg';
+            break;
+    }
 
-function regularBark() {
-    var pic = fs.readFileSync('fotos/preguica.jpg');
+    console.log(`Ação escolhida: ${actionId}`);
+    //console.log(typeof(picPath));
+    return action = {
+        status: status,
+        picPath: picPath
+    };
+}
+
+function regularBark(action) {
+    var pic = fs.readFileSync(action.picPath);
     T.post('media/upload', {media: pic}, function(err, media, response){
         if(!err){
             var params = { 
-                status: 'Preguicinha...',
+                status: action.status,
                 media_ids: media.media_id_string
             };
             
             T.post('statuses/update', params , function(err, data, response) {
                 if(!err){
-                    console.log('Preguiça tuitada');
+                    console.log('Comportamento tuitado');
                 } else {
                     console.log(err);
                 }
@@ -75,4 +117,4 @@ function regularBark() {
     });
 }
 
-regularBark();
+setInterval(function() {regularBark(dogAction())}, 1000*60*10);
