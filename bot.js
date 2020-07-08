@@ -23,24 +23,23 @@ function barkGenerator() {
 var stream = T.stream('statuses/filter', {track: 'paçoca'});
 stream.on('data', function(event) {
     console.log(event && event.text);
-    var tweetDate = new Date(event.created_at);
-    var nowDate = new Date();
-    console.log(`Data do tweet: ${tweetDate}`);
-    console.log(`Data atual: ${nowDate}`);
-    if(tweetDate.toLocaleDateString() == nowDate.toLocaleDateString() && tweetDate.getUTCHours() == nowDate.getUTCHours() && tweetDate.getUTCMinutes() >= nowDate.getUTCMinutes()-1){
+    if(!event.retweeted_status){
         var replyTo = event.user.screen_name;
         var replyId_str = event.id_str;
         bark(replyTo, replyId_str);
+    } else {
+        console.log(`Tweet é retweet`);
+        console.log(`-------------------------------------------`);
     }
 });
 
 stream.on('error', function(error) {
   throw error;
 });
-
+// '@' + barkTo +  ' ' + 
 function bark(barkTo, barkToIdStr) {
     var params = { 
-        status: '@' + barkTo +  ' ' + barkGenerator(),
+        status: barkGenerator(),
         in_reply_to_status_id: barkToIdStr, // Precisa ser a id_str pq o javascript não suporta um número tão grande
         auto_populate_reply_metadata: true
     };
@@ -48,6 +47,7 @@ function bark(barkTo, barkToIdStr) {
         if(!err){
             console.log(`Bark: ${data.text}`);
             console.log(`Barking to tweet ID: ${data.in_reply_to_status_id_str}`);
+            console.log(`-------------------------------------------`);
         } else {
             console.log(err);
         }
@@ -59,7 +59,7 @@ function dogAction() {
     // Dormir, fazer xixi, morder alguma coisa, ficar entediado
     var status;
     var picPath;
-    var actionId = Math.floor(Math.random()*5);
+    var actionId = Math.floor(Math.random()*7);
     
     switch (actionId) {
         case 0: 
@@ -82,7 +82,23 @@ function dogAction() {
             status = 'WOUF';
             picPath = 'fotos/deboa.jpg';
             break;
-    
+        case 5: 
+            status = 'WOSHH';
+            picPath = 'fotos/nadando.jpg';
+            break;
+        case 6: 
+            status = 'ehmole kkkkkk';
+            picPath = 'fotos/ehmole.jpg';
+            break;
+        case 7: 
+            status = '*cãin*';
+            picPath = 'fotos/triste.jpg';
+            break;
+        case 8: 
+            status = '...';
+            picPath = 'fotos/cagando.png';
+            break;
+        
         default:
             status = 'WOUF';
             picPath = 'fotos/deboa.jpg';
@@ -109,6 +125,7 @@ function regularBark(action) {
             T.post('statuses/update', params , function(err, data, response) {
                 if(!err){
                     console.log('Comportamento tuitado');
+                    console.log(`-------------------------------------------`);
                 } else {
                     console.log(err);
                 }
