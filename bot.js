@@ -20,17 +20,33 @@ function barkGenerator() {
     return barkTweet;
 }
 
-function bark(barkTo, barkToId, barkToIdStr) {
+var stream = T.stream('statuses/filter', {track: 'paçoca'});
+stream.on('data', function(event) {
+    console.log(event && event.text);
+    var tweetDate = new Date(event.created_at);
+    var nowDate = new Date();
+    console.log(`Data do tweet: ${tweetDate}`);
+    console.log(`Data atual: ${nowDate}`);
+    if(tweetDate.toLocaleDateString() == nowDate.toLocaleDateString() && tweetDate.getUTCHours() == nowDate.getUTCHours() && tweetDate.getUTCMinutes() >= nowDate.getUTCMinutes()-1){
+        var replyTo = event.user.screen_name;
+        var replyId_str = event.id_str;
+        bark(replyTo, replyId_str);
+    }
+});
+
+stream.on('error', function(error) {
+  throw error;
+});
+
+function bark(barkTo, barkToIdStr) {
     var params = { 
         status: '@' + barkTo +  ' ' + barkGenerator(),
         in_reply_to_status_id: barkToIdStr, // Precisa ser a id_str pq o javascript não suporta um número tão grande
         auto_populate_reply_metadata: true
     };
-    console.log(`Bark: ${params.status}`);
-    console.log(`Barking to tweet ID: ${params.in_reply_to_status_id}`);
     T.post('statuses/update', params , function(err, data, response) {
         if(!err){
-            console.log(`Bark: ${data.status}`);
+            console.log(`Bark: ${data.text}`);
             console.log(`Barking to tweet ID: ${data.in_reply_to_status_id_str}`);
         } else {
             console.log(err);
@@ -38,45 +54,31 @@ function bark(barkTo, barkToId, barkToIdStr) {
     });
 }
 
-var stream = T.stream('statuses/filter', {track: 'paçoca'});
-stream.on('data', function(event) {
-    console.log(event && event.text);
-    var replyTo = event.user.screen_name;
-    var replyId = event.id;
-    var replyId_str = event.id_str;
-    bark(replyTo, replyId, replyId_str);
-});
-
-stream.on('error', function(error) {
-  throw error;
-});
-
 function dogAction() {
     // ações do cachorro virtual:
     // Dormir, fazer xixi, morder alguma coisa, ficar entediado
     var status;
     var picPath;
-
-    var actionId = Math.floor(Math.random()*5)+1;
-    //var actionId = 5
+    var actionId = Math.floor(Math.random()*5);
+    
     switch (actionId) {
-        case 1: 
+        case 0: 
             status = 'ZZzzzZZZzzzz.....';
-            picPath = 'fotos/preguica.jpg';
+            picPath = 'fotos/dormindo.jpg';
             break;
-        case 2: 
+        case 1: 
             status = 'Meh';
             picPath = 'fotos/tedio.jpg';
             break;
-        case 3: 
+        case 2: 
             status = '*xiiiiiiiiiiiiiii*';
             picPath = 'fotos/xixi.jpg'
             break;
-        case 4: 
+        case 3: 
             status = 'GRRRRRRRR';
             picPath = 'fotos/raiva.jpg';
             break;
-        case 5: 
+        case 4: 
             status = 'WOUF';
             picPath = 'fotos/deboa.jpg';
             break;
@@ -88,7 +90,7 @@ function dogAction() {
     }
 
     console.log(`Ação escolhida: ${actionId}`);
-    //console.log(typeof(picPath));
+
     return action = {
         status: status,
         picPath: picPath
