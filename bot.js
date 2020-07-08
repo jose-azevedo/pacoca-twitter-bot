@@ -136,4 +136,4 @@ function regularBark(action) {
     });
 }
 
-setInterval(function() {regularBark(dogAction())}, 1000*60*10);
+setInterval(function() {regularBark(dogAction())}, 1000*60*60*2);
