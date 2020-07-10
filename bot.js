@@ -20,7 +20,7 @@ function barkGenerator() {
     return barkTweet;
 }
 
-var stream = T.stream('statuses/filter', {track: 'paçoca'});
+var stream = T.stream('statuses/filter', {track: 'paçoca,@pacoca_acaxorra'});
 stream.on('data', function(event) {
     console.log(event && event.text);
     if(!event.retweeted_status){
@@ -59,12 +59,23 @@ function searchLoveOrHate(event) {
                 media_ids: ''
             }
         };
-    } else if(event.text.search('comer') > -1 || event.text.search('comi') > -1 || event.text.search('como') > -1){
+    } else if(event.text.search('comer') > -1 || event.text.search('comi') > -1 || event.text.search('comendo') > -1){
         return {
             found: true,
             picPath: 'fotos/assustado.jpg',
             params: {
                 status: '...',
+                in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
+                auto_populate_reply_metadata: true,
+                media_ids: ''
+            }
+        };
+    } else if(event.text.search('@pacoca_acaxorra') > -1){
+        return {
+            found: true,
+            picPath: 'fotos/highfive.jpg',
+            params: {
+                status: '',
                 in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
                 auto_populate_reply_metadata: true,
                 media_ids: ''
