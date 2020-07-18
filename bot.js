@@ -129,7 +129,7 @@ function bark(params) {
 function dogAction() {
     var status;
     var picPath;
-    var actionId = Math.floor(Math.random()*10);
+    var actionId = Math.floor(Math.random()*14);
     
     switch (actionId) {
         case 0: 
@@ -168,12 +168,27 @@ function dogAction() {
             status = '...';
             picPath = 'fotos/cagando.png';
             break;
-        
         case 9: 
             status = '#amopaçoca';
             picPath = 'fotos/profile_pic.png';
             break;
-        
+        case 10: 
+            status = '*TCHBUUUM*';
+            picPath = 'fotos/tchbum.jpg';
+            break;
+        case 11: 
+            status = '*slip*';
+            picPath = 'fotos/lambida.jpg';
+            break;
+        case 12: 
+            status = 'unhee';
+            picPath = 'fotos/coçada.jpg';
+            break;
+        case 13: 
+            status = 'BBRRRRRRR';
+            picPath = 'fotos/neve.jpg';
+            break;
+
         default:
             status = 'WOUF';
             picPath = 'fotos/deboa.jpg';
@@ -211,4 +226,4 @@ function regularBark(action) {
     });
 }
 
-setInterval(function() {regularBark(dogAction())}, 1000*60*60*2);
+setInterval(function() {regularBark(dogAction())}, 1000*60*60*5);
