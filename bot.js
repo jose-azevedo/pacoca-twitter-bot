@@ -1,207 +1,118 @@
-// API KEY: tDmrgryPscZEPhOjtQfKnp0L0
-// API SECRET KEY: 12A7ria7eSgfzUzyDt6tQg5dJFil1KwHhm42xDA5PgYs6Lxg1c
-// BEARER TOKEN: AAAAAAAAAAAAAAAAAAAAAPD0FgEAAAAA8EtKxXtoZ8bscYt0qQIX0535sC8%3DC4PZNOMcrReHmvgJ5EhHWMBKUtuDN51m36ycWuMtSpQpQfEKVb
+import Twitter from 'twitter';
+import config from './config.js';
+import fs from 'fs'; 
+
+const T = new Twitter(config);
 
 console.log("The dog is alive");
 
-const Twitter = require('twitter');
-const config = require('./config');
-const fs = require('fs'); 
-
-var T = new Twitter(config);
-
-function barkGenerator() {
-    var barkTimes = Math.floor(Math.random()*60);
-    const bark = 'AU'
-    var barkTweet = '';
-    for(var i = 0; i < barkTimes; i++){
-        barkTweet += bark;
+function makeStatusRandom(tweetChar) {
+    const repetitions = Math.floor(Math.random()*15);
+    console.log(`Repetições: ${repetitions}`)
+    var tweetStatus = '';
+    for(var i = 0; i < repetitions; i++){
+        if (Math.random() > 0.5) {
+            tweetStatus += tweetChar.toUpperCase();
+        } else {
+            tweetStatus += tweetChar.toLowerCase();
+        }
     }
-    return barkTweet;
+    tweetStatus += tweetChar;
+    return tweetStatus;
 }
 
-var stream = T.stream('statuses/filter', {track: 'paçoca,@pacoca_acaxorra'});
-stream.on('data', function(event) {
-    console.log(event && event.text);
-    if(!event.retweeted_status){
-        var params = searchLoveOrHate(event);
-        bark(params);
-    } else {
-        console.log(`Tweet é retweet`);
-        console.log(`-------------------------------------------`);
+const timedTweets = [
+    {
+        action: 'sleep',
+        status: 'ZZzzzZZZz' + makeStatusRandom('z') + '.....',
+        picPath: 'fotos/dormindo.jpg'
+    },
+    {
+        action: 'bored',
+        status: 'Meh',
+        picPath: 'fotos/tedio.jpg'
+    },
+    {
+        action: 'pee',
+        status: '*xiii' + makeStatusRandom('i') + 'iii*',
+        picPath: 'fotos/xixi.jpg'
+    },
+    {
+        action: 'angry',
+        status: 'GRRR' + makeStatusRandom('r'),
+        picPath: 'fotos/raiva.jpg'
+    },
+    {
+        action: 'greet',
+        status: 'WOUF',
+        picPath: 'fotos/deboa.jpg'
+    },
+    {
+        action: 'swim',
+        status: 'WOSH' + makeStatusRandom('h'),
+        picPath: 'fotos/nadando.jpg'
+    },
+    {
+        action: 'ehmole',
+        status: 'ehmole kkkkkk' + makeStatusRandom('k'),
+        picPath: 'fotos/ehmole.jpg'
+    },
+    {
+        action: 'sad', 
+        status: '*cãin*',
+        picPath: 'fotos/triste.jpg'
+    },
+    {
+        action: 'poo',
+        status: makeStatusRandom('.'),
+        picPath: 'fotos/cagando.png'
+    },
+    {
+        action: '#amopacoca',
+        status: '#amopaçoca',
+        picPath: 'fotos/profile_pic.png'
+    },
+    {
+        action: 'dive',
+        status: '*TCHBU' + makeStatusRandom('u') + 'M*',
+        picPath: 'fotos/tchbum.jpg'
+    },
+    {
+        action: 'lick',
+        status: '*slip*',
+        picPath: 'fotos/lambida.jpg'
+    },
+    {
+        action: 'scratch',
+        status: 'unhe' + makeStatusRandom('e'),
+        picPath: 'fotos/coçada.jpg'
+    },
+    {
+        action: 'cold',
+        status: 'BBRR' + makeStatusRandom('r'),
+        picPath: 'fotos/neve.jpg'
+    },
+    {
+        action: 'highfive',
+        status: 'AU',
+        picPath: 'fotos/highfive.jpg'
+    },
+    {
+        action: 'scared',
+        status: makeStatusRandom('.'),
+        picPath: 'fotos/assustado.jpg'
+    },
+    {
+        action: 'love',
+        status: makeStatusRandom('WOUF'),
+        picPath: 'fotos/amopacoca.jpg'
+    },
+    {
+        action: 'bark',
+        status: makeStatusRandom('AU'),
+        picPath: ''
     }
-});
-
-stream.on('error', function(error) {
-  throw error;
-});
-
-function searchLoveOrHate(event) {
-    if(event.text.search('amo') > -1 || event.text.search('adoro') > -1 || event.text.search('eu gosto de paçoca') > -1 || event.text.search('gostoso') > -1 || event.text.search('delícia') > -1 || event.text.search('bom') > -1){
-        return {
-            found: true,
-            picPath: 'fotos/amopacoca.jpg',
-            params: {
-                status: 'WOUF',
-                in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
-                auto_populate_reply_metadata: true,
-                media_ids: ''
-            }
-        };
-    } else if(event.text.search('odeio') > -1 || event.text.search('não gosto') > -1 || event.text.search('horrível') > -1 || event.text.search('ruim') > -1){
-        return {
-            found: true,
-            picPath: 'fotos/raiva.jpg',
-            params: {
-                status: 'GGGRRRRRRRRRRR',
-                in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
-                auto_populate_reply_metadata: true,
-                media_ids: ''
-            }
-        };
-    } else if(event.text.search('comer') > -1 || event.text.search('comi') > -1 || event.text.search('comendo') > -1){
-        return {
-            found: true,
-            picPath: 'fotos/assustado.jpg',
-            params: {
-                status: '...',
-                in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
-                auto_populate_reply_metadata: true,
-                media_ids: ''
-            }
-        };
-    } else if(event.text.search('@pacoca_acaxorra') > -1){
-        return {
-            found: true,
-            picPath: 'fotos/highfive.jpg',
-            params: {
-                status: '',
-                in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
-                auto_populate_reply_metadata: true,
-                media_ids: ''
-            }
-        };
-    } else {
-        return {
-            found: false,
-            params: {
-                status: barkGenerator(),
-                in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
-                auto_populate_reply_metadata: true
-            }
-        };
-    }
-}
-
-function bark(params) {
-    var replyParams = params;
-    if(replyParams.found){
-        var pic = fs.readFileSync(replyParams.picPath);
-        T.post('media/upload', {media: pic}, function(err, media, response){
-            if(!err){
-                replyParams.params.media_ids = media.media_id_string;
-                T.post('statuses/update', replyParams.params , function(err, data, response) {
-                    if(!err){
-                        console.log(`Bark: ${data.text}`);
-                        console.log(`Barking to tweet ID: ${data.in_reply_to_status_id_str}`);
-                        console.log(`-------------------------------------------`);
-                    } else {
-                        console.log(err);
-                    }
-                });
-            } else {
-                console.log(err);
-            }
-        });
-    } else {
-        T.post('statuses/update', replyParams.params , function(err, data, response) {
-            if(!err){
-                console.log(`Bark: ${data.text}`);
-                console.log(`Barking to tweet ID: ${data.in_reply_to_status_id_str}`);
-                console.log(`-------------------------------------------`);
-            } else {
-                console.log(err);
-            }
-        });
-    }
-}
-
-function dogAction() {
-    var status;
-    var picPath;
-    var actionId = Math.floor(Math.random()*14);
-    
-    switch (actionId) {
-        case 0: 
-            status = 'ZZzzzZZZzzzz.....';
-            picPath = 'fotos/dormindo.jpg';
-            break;
-        case 1: 
-            status = 'Meh';
-            picPath = 'fotos/tedio.jpg';
-            break;
-        case 2: 
-            status = '*xiiiiiiiiiiiiiii*';
-            picPath = 'fotos/xixi.jpg'
-            break;
-        case 3: 
-            status = 'GRRRRRRRR';
-            picPath = 'fotos/raiva.jpg';
-            break;
-        case 4: 
-            status = 'WOUF';
-            picPath = 'fotos/deboa.jpg';
-            break;
-        case 5: 
-            status = 'WOSHH';
-            picPath = 'fotos/nadando.jpg';
-            break;
-        case 6: 
-            status = 'ehmole kkkkkk';
-            picPath = 'fotos/ehmole.jpg';
-            break;
-        case 7: 
-            status = '*cãin*';
-            picPath = 'fotos/triste.jpg';
-            break;
-        case 8: 
-            status = '...';
-            picPath = 'fotos/cagando.png';
-            break;
-        case 9: 
-            status = '#amopaçoca';
-            picPath = 'fotos/profile_pic.png';
-            break;
-        case 10: 
-            status = '*TCHBUUUM*';
-            picPath = 'fotos/tchbum.jpg';
-            break;
-        case 11: 
-            status = '*slip*';
-            picPath = 'fotos/lambida.jpg';
-            break;
-        case 12: 
-            status = 'unhee';
-            picPath = 'fotos/coçada.jpg';
-            break;
-        case 13: 
-            status = 'BBRRRRRRR';
-            picPath = 'fotos/neve.jpg';
-            break;
-
-        default:
-            status = 'WOUF';
-            picPath = 'fotos/deboa.jpg';
-            break;
-    }
-
-    console.log(`Ação escolhida: ${actionId}`);
-
-    return action = {
-        status: status,
-        picPath: picPath
-    };
-}
+]
 
 function regularBark(action) {
     var pic = fs.readFileSync(action.picPath);
@@ -226,4 +137,110 @@ function regularBark(action) {
     });
 }
 
-setInterval(function() {regularBark(dogAction())}, 1000*60*60*5);
+function chooseAction() {
+    const actionId = Math.floor(Math.random()*14);
+    
+    const chosenAction = timedTweets[actionId];
+
+    console.log(`Ação escolhida: ${actionId}`);
+
+    return chosenAction;
+}
+
+setInterval(function() {regularBark(chooseAction())}, 1000*60*60*5);
+
+var stream = T.stream('statuses/filter', {track: 'paçoca,@pacoca_acaxorra'});
+stream.on('data', function(event) {
+    console.log(event && event.text);
+    if(!event.retweeted_status){
+        const {  replyTweet, foundReaction } = decideReaction(event.text);
+        bark(event, replyTweet, foundReaction);
+    } else {
+        console.log(`Tweet é retweet`);
+        console.log(`-------------------------------------------`);
+    }
+});
+
+stream.on('error', function(error) {
+  throw error;
+});
+
+function getTweet(action) {
+    var chosenTweet;
+    timedTweets.map((tweet, index) => {
+        if (tweet.action == action) {
+            chosenTweet = tweet;
+        }
+    });
+    return chosenTweet;
+}
+
+function decideReaction(tweetText) {
+    if(tweetText.search('amo') > -1 || tweetText.search('adoro') > -1 || tweetText.search('eu gosto de paçoca') > -1 || tweetText.search('gostoso') > -1 || tweetText.search('delícia') > -1 || tweetText.search('bom') > -1){
+        return {
+            foundReaction: true,
+            replyTweet: getTweet('love')
+        };
+    } else if(tweetText.search('odeio') > -1 || tweetText.search('não gosto') > -1 || tweetText.search('horrível') > -1 || tweetText.search('ruim') > -1){
+        return {
+            foundReaction: true,
+            replyTweet: getTweet('angry')
+        };
+    } else if(tweetText.search('comer') > -1 || tweetText.search('comi') > -1 || tweetText.search('comendo') > -1){
+        return {
+            foundReaction: true,
+            replyTweet: getTweet('scared')
+        };
+    } else if(tweetText.search('@pacoca_acaxorra') > -1){
+        return {
+            foundReaction: true,
+            replyTweet: getTweet('highfive')
+        };
+    } else {
+        return {
+            foundReaction: false,
+            replyTweet: getTweet('bark')
+        };
+    }
+}
+
+function bark(event, reactionParams, foundReaction) {
+
+    var statusParams = {
+        status: reactionParams.status,
+        in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
+        auto_populate_reply_metadata: true
+    }
+
+    console.log(reactionParams);
+
+    if(foundReaction){
+        var pic = fs.readFileSync(reactionParams.picPath);
+        T.post('media/upload', {media: pic}, function(err, media, response){
+            if(!err){
+                statusParams.media_ids = media.media_id_string;
+                T.post('statuses/update', statusParams , function(err, data, response) {
+                    if(!err){
+                        console.log(`Bark: ${data.text}`);
+                        console.log(`Barking to tweet ID: ${data.in_reply_to_status_id_str}`);
+                        console.log(`-------------------------------------------`);
+                    } else {
+                        console.log(err);
+                    }
+                });
+            } else {
+                console.log(err);
+            }
+        });
+    } else {
+        T.post('statuses/update', statusParams , function(err, data, response) {
+            if(!err){
+                console.log(`Bark: ${data.text}`);
+                console.log(`Barking to tweet ID: ${data.in_reply_to_status_id_str}`);
+                console.log(`-------------------------------------------`);
+            } else {
+                console.log(err);
+            }
+        });
+    }
+}
