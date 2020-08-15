@@ -1,5 +1,5 @@
 import Twitter from 'twitter';
-import tweetLib from './tweetLibrary.json';
+import tweetLibrary from './tweetLibrary.js';
 import config from './config.js';
 import fs from 'fs'; 
 
@@ -7,133 +7,46 @@ const T = new Twitter(config);
 
 console.log("The dog is alive");
 
-function makeStatusRandom(tweetChar) {
-    const repetitions = Math.floor(Math.random()*15);
-    var tweetStatus = '';
+function makeStatusRandom({statusBeginning, repeatedChar, statusEnding}) {
+    const repetitions = Math.floor(Math.random()*20);
+    var repeatedCharBuffer = '';
     for(var i = 0; i < repetitions; i++){
         if (Math.random() > 0.5) {
-            tweetStatus += tweetChar.toUpperCase();
+            repeatedCharBuffer += repeatedChar.toUpperCase();
         } else {
-            tweetStatus += tweetChar.toLowerCase();
+            repeatedCharBuffer += repeatedChar.toLowerCase();
         }
     }
-    tweetStatus += tweetChar;
-    return tweetStatus;
+    const finalStatus = statusBeginning + repeatedCharBuffer + statusEnding;
+    return finalStatus;
 }
 
 function fetchTweet(requestedTweet) {
-    const tweetLibrary = [
-        {
-            action: 'sleep',
-            status: 'ZZzzzZZZz' + makeStatusRandom('z') + '.....',
-            picPath: 'fotos/dormindo.jpg'
-        },
-        {
-            action: 'bored',
-            status: 'Meh',
-            picPath: 'fotos/tedio.jpg'
-        },
-        {
-            action: 'pee',
-            status: '*xiii' + makeStatusRandom('i') + 'iii*',
-            picPath: 'fotos/xixi.jpg'
-        },
-        {
-            action: 'angry',
-            status: 'GRRR' + makeStatusRandom('r'),
-            picPath: 'fotos/raiva.jpg'
-        },
-        {
-            action: 'greet',
-            status: 'WOUF',
-            picPath: 'fotos/deboa.jpg'
-        },
-        {
-            action: 'swim',
-            status: 'WOSH' + makeStatusRandom('h'),
-            picPath: 'fotos/nadando.jpg'
-        },
-        {
-            action: 'ehmole',
-            status: 'ehmole kkkkkk' + makeStatusRandom('k'),
-            picPath: 'fotos/ehmole.jpg'
-        },
-        {
-            action: 'sad', 
-            status: '*cãin*',
-            picPath: 'fotos/triste.jpg'
-        },
-        {
-            action: 'poo',
-            status: makeStatusRandom('.'),
-            picPath: 'fotos/cagando.png'
-        },
-        {
-            action: '#amopacoca',
-            status: '#amopaçoca',
-            picPath: 'fotos/profile_pic.png'
-        },
-        {
-            action: 'dive',
-            status: '*TCHBU' + makeStatusRandom('u') + 'M*',
-            picPath: 'fotos/tchbum.jpg'
-        },
-        {
-            action: 'lick',
-            status: '*slip*',
-            picPath: 'fotos/lambida.jpg'
-        },
-        {
-            action: 'scratch',
-            status: 'unhe' + makeStatusRandom('e'),
-            picPath: 'fotos/coçada.jpg'
-        },
-        {
-            action: 'cold',
-            status: 'BBRR' + makeStatusRandom('r'),
-            picPath: 'fotos/neve.jpg'
-        },
-        {
-            action: 'highfive',
-            status: 'AU',
-            picPath: 'fotos/highfive.jpg'
-        },
-        {
-            action: 'scared',
-            status: makeStatusRandom('.'),
-            picPath: 'fotos/assustado.jpg'
-        },
-        {
-            action: 'love',
-            status: makeStatusRandom('WOUF'),
-            picPath: 'fotos/amopacoca.jpg'
-        },
-        {
-            action: 'bark',
-            status: makeStatusRandom('AU'),
-            picPath: ''
-        }
-    ]
+    
+    var chosenTweet;
 
-    console.log(`Tweet requisitado: ${requestedTweet}`)
     if (typeof(requestedTweet) === 'number') {
-        return tweetLibrary[requestedTweet];
+        chosenTweet = tweetLibrary[requestedTweet];
     }
 
     if (typeof(requestedTweet) === 'string') {
-        
-        console.log(`Parâmetro é uma string`)
-        var chosenTweet;
         tweetLibrary.map((tweet) => {
             if (tweet.action == requestedTweet) {
                 chosenTweet = tweet;
             }
         });
-        return chosenTweet
     }
+
+    const finalTweet = {
+        action: chosenTweet.action,
+        status: makeStatusRandom(chosenTweet),
+        picPath: chosenTweet.picPath
+    }
+
+    return finalTweet;
 }
 
-function regularBark(action) {
+function timedBark(action) {
     var pic = fs.readFileSync(action.picPath);
     T.post('media/upload', {media: pic}, function(err, media, response){
         if(!err){
@@ -166,7 +79,7 @@ function chooseAction() {
     return chosenAction;
 }
 
-setInterval(function() {regularBark(chooseAction())}, 1000*60*60*5);
+setInterval(function() {timedBark(chooseAction())}, 1000*60*60*5);
 
 var stream = T.stream('statuses/filter', {track: 'paçoca,@pacoca_acaxorra'});
 stream.on('data', function(event) {
@@ -183,16 +96,6 @@ stream.on('data', function(event) {
 stream.on('error', function(error) {
   throw error;
 });
-
-function getTweet(action) {
-    var chosenTweet;
-    tweetLibrary.map((tweet, index) => {
-        if (tweet.action == action) {
-            chosenTweet = tweet;
-        }
-    });
-    return chosenTweet;
-}
 
 function decideReaction(tweetText) {
     if(tweetText.search('amo') > -1 || tweetText.search('adoro') > -1 || tweetText.search('eu gosto de paçoca') > -1 || tweetText.search('gostoso') > -1 || tweetText.search('delícia') > -1 || tweetText.search('bom') > -1){
@@ -230,8 +133,6 @@ function bark(event, reactionParams, foundReaction) {
         in_reply_to_status_id: event.id_str, // Precisa ser a id_str pq o javascript não suporta um número tão grande
         auto_populate_reply_metadata: true
     }
-
-    console.log(reactionParams);
 
     if(foundReaction){
         var pic = fs.readFileSync(reactionParams.picPath);
