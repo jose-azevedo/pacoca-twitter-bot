@@ -4,8 +4,8 @@
   "description": "A Twitter virtual dog",
   "main": "bot.js",
   "scripts": {
-    "start": "ts-node bot.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/bot.js",
+    "postinstall": "tsc"
   },
   "keywords": [
     "bot",
@@ -15,7 +15,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^10.0.0",
-    "twitter": "^1.7.1"
+    "twitter": "^1.7.1",
+    "typescript": "^4.5.4"
   },
   "devDependencies": {
     "@types/twitter": "^1.7.1"
