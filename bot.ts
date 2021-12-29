@@ -96,7 +96,7 @@ const replyTweets = async () => {
 };
 
 const stream = twitter.stream('statuses/filter', {
-  track: 'paçoca,@pacoca_acaxorra',
+  track: '@pacoca_acaxorra',
 });
 
 const startDog = () => {

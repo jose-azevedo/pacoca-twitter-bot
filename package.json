@@ -5,6 +5,7 @@
   "main": "bot.js",
   "scripts": {
     "start": "node dist/bot.js",
+    "dev": "ts-node bot.ts",
     "postinstall": "tsc"
   },
   "keywords": [
