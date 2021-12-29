@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "A Twitter virtual dog",
   "main": "bot.js",
-  "type": "module",
   "scripts": {
-    "start": "node bot.js",
+    "start": "ts-node bot.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -15,6 +14,13 @@
   "author": "Jose Azevedo",
   "license": "ISC",
   "dependencies": {
-    "twitter": "^1.7.1"
+    "dotenv": "^10.0.0",
+    "twit": "^2.2.11",
+    "twitter": "^1.7.1",
+    "twitter-lite": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/twit": "^2.2.30",
+    "@types/twitter": "^1.7.1"
   }
 }
